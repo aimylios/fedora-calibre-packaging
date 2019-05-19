@@ -5,8 +5,8 @@
 %global _python_bytecompile_extra 0
 
 Name:           calibre
-Version:        3.36.0
-Release:        4%{?dist}
+Version:        3.42.0
+Release:        1%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            http://calibre-ebook.com/
@@ -32,46 +32,40 @@ Patch1:         %{name}-no-update.patch
 #
 Patch3:         calibre-nodisplay.patch
 
-BuildRequires:  python2 >= 2.7
-BuildRequires:  python2-devel >= 2.7
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-qt5-devel
-BuildRequires:  python2-qt5
-BuildRequires:  python2-qt5-webkit
-BuildRequires:  podofo-devel
-BuildRequires:  desktop-file-utils
-BuildRequires:  python2-mechanize
-BuildRequires:  python2-lxml
-BuildRequires:  python2-dateutil
-BuildRequires:  python2-imaging
-BuildRequires:  xdg-utils
-BuildRequires:  python2-beautifulsoup
-BuildRequires:  chmlib-devel
-BuildRequires:  python2-cssutils >= 0.9.9
-BuildRequires:  sqlite-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libmtp-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  web-assets-devel
-BuildRequires:  qt5-qtbase-static
-BuildRequires:  libXrender-devel
-BuildRequires:  systemd-devel
-BuildRequires:  qt5-qtwebkit-devel
-BuildRequires:  openssl-devel
-# calibre installer is so smart that it check for the presence of the
-# directory (and then installs in the wrong place)
 BuildRequires:  bash-completion
-BuildRequires:  python2-apsw
-BuildRequires:  python2-enum34
-BuildRequires:  glib2-devel
+BuildRequires:  desktop-file-utils
+BuildRequires:  chmlib-devel
 BuildRequires:  fontconfig-devel
-BuildRequires:  libinput-devel
-BuildRequires:  libxkbcommon-devel
-BuildRequires:  python2-msgpack
-BuildRequires:  python2-regex
-BuildRequires:  python2-html5-parser
+BuildRequires:  glib2-devel
 BuildRequires:  libappstream-glib
+BuildRequires:  libicu-devel
+BuildRequires:  libmtp-devel
+BuildRequires:  openssl-devel
+BuildRequires:  podofo-devel
+BuildRequires:  python3-apsw
+BuildRequires:  python3-beautifulsoup4
+BuildRequires:  python3-css-parser
+BuildRequires:  python3-dateutil
+BuildRequires:  python3-devel
+BuildRequires:  python3-html5-parser
+BuildRequires:  python3-msgpack
+BuildRequires:  python3-pillow
+BuildRequires:  python3-qt5-devel
+BuildRequires:  python3-qt5-webkit
+BuildRequires:  python3-regex
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-static
+BuildRequires:  sqlite-devel
+BuildRequires:  xdg-utils
+# for tests
+#BuildRequires:  python3-dukpy
+#BuildRequires:  python3-html2text
+#BuildRequires:  python3-html5lib
+#BuildRequires:  python3-netifaces
+#BuildRequires:  python3-psutil
+#BuildRequires:  python3-qt5-webkit
+#BuildRequires:  python3-soupsieve
+#BuildRequires:  python3-zeroconf
 
 %{?pyqt5_requires}
 # once ^^ %%pyqt5_requires is everywhere, can drop python-qt5 dep below -- rex
@@ -83,35 +77,29 @@ BuildRequires:  libappstream-glib
 BuildRequires:  qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
-Requires:       python2-qt5
-Requires:       python2-qt5-webkit
-Requires:       qt5-qtwebkit
-Requires:       qt5-qtsvg
-Requires:       qt5-qtsensors
-Requires:       python2-cssutils
-Requires:       python2-odfpy
-Requires:       python2-lxml
-Requires:       python2-imaging
-Requires:       python2-mechanize
-Requires:       python2-dateutil
-Requires:       python2-beautifulsoup
-Requires:       poppler-utils
-# Require the packages of the files which are symlinked by calibre
+Requires:       liberation-mono-fonts
 Requires:       liberation-sans-fonts
 Requires:       liberation-serif-fonts
-Requires:       liberation-mono-fonts
-Requires:       python2-feedparser
-Requires:       python2-netifaces
-Requires:       python2-dns
-Requires:       python2-apsw
-Requires:       mathjax
-Requires:       python2-psutil
-Requires:       python2-pygments
 Requires:       optipng
-Requires:       python2-msgpack
-Requires:       python2-regex
-Requires:       python2-html5-parser
-Requires:       python2-enum34
+Requires:       python3-apsw
+Requires:       python3-beautifulsoup4
+Requires:       python3-css-parser
+Requires:       python3-dateutil
+Requires:       python3-dns
+Requires:       python3-html2text
+Requires:       python3-html5-parser
+Requires:       python3-html5lib
+Requires:       python3-mechanize
+Requires:       python3-msgpack
+Requires:       python3-netifaces
+Requires:       python3-odfpy
+Requires:       python3-pillow
+Requires:       python3-psutil
+Requires:       python3-pygments
+Requires:       python3-qt5-webkit
+Requires:       python3-regex
+Requires:       python3-soupsieve
+Requires:       python3-zeroconf
 
 %description
 Calibre is meant to be a complete e-library solution. It includes library
@@ -137,17 +125,14 @@ sed -i -e '/^#![ ]*\//, 1d' src/calibre/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*.py
 sed -i -e '/^#!\//, 1d' src/templite/*.py
 sed -i -e '/^#!\//, 1d' resources/default_tweaks.py
-sed -i -e '/^#!\//, 1d' resources/catalog/section_list_templates.py
 
 chmod -x src/calibre/*/*/*/*.py \
     src/calibre/*/*/*.py \
     src/calibre/*/*.py \
     src/calibre/*.py
 
-rm -rvf resources/viewer/mathjax
-
 %build
-OVERRIDE_CFLAGS="%{optflags}" %__python2 setup.py build
+OVERRIDE_CFLAGS="%{optflags}" CALIBRE_PY3_PORT=1 %{__python3} setup.py build
 
 %install
 mkdir -p %{buildroot}%{_datadir}
@@ -163,7 +148,7 @@ mkdir -p %{buildroot}%{_datadir}/desktop-directories
 
 # create directory for calibre environment module
 # the install script assumes it's there.
-mkdir -p %{buildroot}%{python2_sitelib}
+mkdir -p %{buildroot}%{python3_sitelib}
 
 # create directory for completion files, so calibre knows where
 # to install them
@@ -173,7 +158,7 @@ mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 XDG_DATA_DIRS="%{buildroot}%{_datadir}" \
 XDG_UTILS_INSTALL_MODE="system" \
 LIBPATH="%{_libdir}" \
-%__python2 setup.py install --root=%{buildroot}%{_prefix} \
+CALIBRE_PY3_PORT=1 %{__python3} setup.py install --root=%{buildroot}%{_prefix} \
                             --prefix=%{_prefix} \
                             --libdir=%{_libdir} \
                             --staging-libdir=%{buildroot}%{_libdir} \
@@ -181,18 +166,18 @@ LIBPATH="%{_libdir}" \
 
 # remove shebang from init_calibre.py here because
 # it just got spawned by the install script
-sed -i -e '/^#!\//, 1d' %{buildroot}%{python2_sitelib}/init_calibre.py
+sed -i -e '/^#!\//, 1d' %{buildroot}%{python3_sitelib}/init_calibre.py
 
 # there are some python files there, do byte-compilation on them
-%py_byte_compile %{__python2} %{buildroot}%{_datadir}/%{name}
+%py_byte_compile %{__python3} %{buildroot}%{_datadir}/%{name}
 
 # icons
 mkdir -p %{buildroot}%{_datadir}/pixmaps/
-cp -p resources/images/library.png                \
+cp -p resources/images/library.png \
    %{buildroot}%{_datadir}/pixmaps/%{name}-gui.png
-cp -p resources/images/viewer.png                 \
+cp -p resources/images/viewer.png \
    %{buildroot}%{_datadir}/pixmaps/calibre-viewer.png
-cp -p resources/images/tweak.png                 \
+cp -p resources/images/tweak.png \
    %{buildroot}%{_datadir}/pixmaps/calibre-ebook-edit.png
 
 # every file is empty here
@@ -225,14 +210,14 @@ cp -p resources/images/viewer.png \
 rm -rf %{buildroot}%{_libdir}/%{name}/odf
 
 # rm empty feedparser files.
-rm -rf %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.*
+#rm -rf %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.*
 
-ln -s %{python2_sitelib}/feedparser.py \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.py
-ln -s %{python2_sitelib}/feedparser.pyc \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.pyc
-ln -s %{python2_sitelib}/feedparser.pyo \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.pyo
+#ln -s %%{python3_sitelib}/feedparser.py \
+#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.py
+#ln -s %%{python3_sitelib}/feedparser.pyc \
+#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.pyc
+#ln -s %%{python3_sitelib}/feedparser.pyo \
+#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.pyo
 
 # link to system fonts after we have deleted (see Source0) the non-free ones
 # http://bugs.calibre-ebook.com/ticket/3832
@@ -274,14 +259,12 @@ rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-viewer.appdata.xml
 
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-gui.appdata.xml
 
-%preun
-rm %{_datadir}/%{name}/viewer/mathjax
-
-%posttrans
-ln -s %{_jsdir}/mathjax %{_datadir}/%{name}/viewer/
+#%%check
+#CALIBRE_PY3_PORT=1 %%{__python3} setup.py test
 
 %files
-%doc COPYRIGHT LICENSE Changelog.yaml
+%license COPYRIGHT LICENSE
+%doc Changelog.yaml
 %{_bindir}/calibre
 %{_bindir}/calibre-complete
 %{_bindir}/calibre-customize
@@ -310,12 +293,17 @@ ln -s %{_jsdir}/mathjax %{_datadir}/%{name}/viewer/
 %{_datadir}/mime/packages/*
 %{_datadir}/icons/hicolor/*/mimetypes/*
 %{_datadir}/icons/hicolor/*/apps/*
-%{python2_sitelib}/init_calibre.py*
+%{python3_sitelib}/init_calibre.*
+%{python3_sitelib}/__pycache__/init_calibre.*
 %{_datadir}/bash-completion/completions/%{name}
 %{_datadir}/zsh/site-functions/_%{name}
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Sun May 19 2019 Xxx Xxx <xxx@xxx.xxx> - 3.42.0-1
+- Update to 3.42.0.
+- Switch from Python 2 to Python 3
+
 * Sun Mar 03 2019 Kevin Fenzi <kevin@scrye.com> - 3.36.0-4
 - Rebuild for new qt5.
 
