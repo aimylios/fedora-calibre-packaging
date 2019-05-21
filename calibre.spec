@@ -2,11 +2,9 @@
 
 %global __provides_exclude_from ^%{_libdir}/%{name}/%{name}/plugins/.*\.so$
 
-%global _python_bytecompile_extra 0
-
 Name:           calibre
-Version:        3.42.0
-Release:        1%{?dist}
+Version:        3.43.0
+Release:        0.1.20190521gitb8832d5%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            http://calibre-ebook.com/
@@ -58,13 +56,22 @@ BuildRequires:  qt5-qtbase-static
 BuildRequires:  sqlite-devel
 BuildRequires:  xdg-utils
 # for tests
+#BuildRequires:  jxrlib
+#BuildRequires:  libjpeg-turbo-utils
+#BuildRequires:  optipng
+#BuildRequires:  python2-libs
 #BuildRequires:  python3-dukpy
+#BuildRequires:  python3-feedparser
 #BuildRequires:  python3-html2text
 #BuildRequires:  python3-html5lib
+#BuildRequires:  python3-markdown
+#BuildRequires:  python3-mechanize
 #BuildRequires:  python3-netifaces
 #BuildRequires:  python3-psutil
-#BuildRequires:  python3-qt5-webkit
+#BuildRequires:  python3-pygments
+#BuildRequires:  python3-sgmllib
 #BuildRequires:  python3-soupsieve
+#BuildRequires:  python3-unrardll
 #BuildRequires:  python3-zeroconf
 
 %{?pyqt5_requires}
@@ -77,18 +84,23 @@ BuildRequires:  xdg-utils
 BuildRequires:  qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
+Requires:       jxrlib
 Requires:       liberation-mono-fonts
 Requires:       liberation-sans-fonts
 Requires:       liberation-serif-fonts
+Requires:       libjpeg-turbo-utils
+#Requires:       mathjax
 Requires:       optipng
 Requires:       python3-apsw
 Requires:       python3-beautifulsoup4
 Requires:       python3-css-parser
 Requires:       python3-dateutil
 Requires:       python3-dns
+Requires:       python3-feedparser
 Requires:       python3-html2text
 Requires:       python3-html5-parser
 Requires:       python3-html5lib
+Requires:       python3-markdown
 Requires:       python3-mechanize
 Requires:       python3-msgpack
 Requires:       python3-netifaces
@@ -96,6 +108,7 @@ Requires:       python3-odfpy
 Requires:       python3-pillow
 Requires:       python3-psutil
 Requires:       python3-pygments
+Requires:       python3-qt5
 Requires:       python3-qt5-webkit
 Requires:       python3-regex
 Requires:       python3-soupsieve
@@ -158,11 +171,12 @@ mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 XDG_DATA_DIRS="%{buildroot}%{_datadir}" \
 XDG_UTILS_INSTALL_MODE="system" \
 LIBPATH="%{_libdir}" \
-CALIBRE_PY3_PORT=1 %{__python3} setup.py install --root=%{buildroot}%{_prefix} \
-                            --prefix=%{_prefix} \
-                            --libdir=%{_libdir} \
-                            --staging-libdir=%{buildroot}%{_libdir} \
-                            --staging-sharedir=%{buildroot}%{_datadir}
+CALIBRE_PY3_PORT=1 %{__python3} setup.py install \
+    --root=%{buildroot}%{_prefix} \
+    --prefix=%{_prefix} \
+    --libdir=%{_libdir} \
+    --staging-libdir=%{buildroot}%{_libdir} \
+    --staging-sharedir=%{buildroot}%{_datadir}
 
 # remove shebang from init_calibre.py here because
 # it just got spawned by the install script
@@ -190,11 +204,11 @@ rm -f %{buildroot}%{_datadir}/mime/application/*.xml
 rm -f %{buildroot}%{_datadir}/mime/text/*.xml
 
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-ebook-viewer.desktop
+    %{buildroot}%{_datadir}/applications/calibre-ebook-viewer.desktop
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-gui.desktop
+    %{buildroot}%{_datadir}/applications/calibre-gui.desktop
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
+    %{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
 
 # mimetype icon for lrf
 rm -rf %{buildroot}%{_datadir}/icons/hicolor/128x128
@@ -208,16 +222,6 @@ cp -p resources/images/viewer.png \
 
 # these are provided as separate packages
 rm -rf %{buildroot}%{_libdir}/%{name}/odf
-
-# rm empty feedparser files.
-#rm -rf %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.*
-
-#ln -s %%{python3_sitelib}/feedparser.py \
-#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.py
-#ln -s %%{python3_sitelib}/feedparser.pyc \
-#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.pyc
-#ln -s %%{python3_sitelib}/feedparser.pyo \
-#      %%{buildroot}%%{_libdir}/%%{name}/%%{name}/web/feeds/feedparser.pyo
 
 # link to system fonts after we have deleted (see Source0) the non-free ones
 # http://bugs.calibre-ebook.com/ticket/3832
@@ -300,6 +304,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Tue May 21 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190521gitb8832d5
+- Update to current git head
+
 * Sun May 19 2019 Xxx Xxx <xxx@xxx.xxx> - 3.42.0-1
 - Update to 3.42.0.
 - Switch from Python 2 to Python 3
