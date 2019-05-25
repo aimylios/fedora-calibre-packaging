@@ -4,7 +4,7 @@
 
 Name:           calibre
 Version:        3.43.0
-Release:        0.1.20190521gitb8832d5%{?dist}
+Release:        0.1.20190525git10f57cf%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            http://calibre-ebook.com/
@@ -30,7 +30,6 @@ Patch1:         %{name}-no-update.patch
 #
 Patch3:         calibre-nodisplay.patch
 
-BuildRequires:  bash-completion
 BuildRequires:  desktop-file-utils
 BuildRequires:  chmlib-devel
 BuildRequires:  fontconfig-devel
@@ -38,6 +37,7 @@ BuildRequires:  glib2-devel
 BuildRequires:  libappstream-glib
 BuildRequires:  libicu-devel
 BuildRequires:  libmtp-devel
+BuildRequires:  mathjax
 BuildRequires:  openssl-devel
 BuildRequires:  podofo-devel
 BuildRequires:  python3-apsw
@@ -53,7 +53,9 @@ BuildRequires:  python3-qt5-webkit
 BuildRequires:  python3-regex
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qtbase-static
+BuildRequires:  sip
 BuildRequires:  sqlite-devel
+BuildRequires:  web-assets-devel
 BuildRequires:  xdg-utils
 # for tests
 #BuildRequires:  jxrlib
@@ -89,17 +91,20 @@ Requires:       liberation-mono-fonts
 Requires:       liberation-sans-fonts
 Requires:       liberation-serif-fonts
 Requires:       libjpeg-turbo-utils
-#Requires:       mathjax
+Requires:       mathjax
 Requires:       optipng
+Requires:       poppler-utils
 Requires:       python3-apsw
 Requires:       python3-beautifulsoup4
 Requires:       python3-css-parser
 Requires:       python3-dateutil
+Requires:       python3-dbus
 Requires:       python3-dns
 Requires:       python3-feedparser
 Requires:       python3-html2text
 Requires:       python3-html5-parser
 Requires:       python3-html5lib
+Requires:       python3-lxml
 Requires:       python3-markdown
 Requires:       python3-mechanize
 Requires:       python3-msgpack
@@ -134,30 +139,35 @@ RTF, TXT, PDF and LRS.
 # remove shebangs
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*.py
-sed -i -e '/^#![ ]*\//, 1d' src/calibre/*/*.py
+sed -i -e '/^#!\//, 1d' src/calibre/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*.py
+sed -i -e '/^#!\//, 1d' src/css_selectors/*.py
+sed -i -e '/^#!\//, 1d' src/lzma/*.py
+sed -i -e '/^#!\//, 1d' src/polyglot/*.py
 sed -i -e '/^#!\//, 1d' src/templite/*.py
+sed -i -e '/^#!\//, 1d' src/tinycss/*.py
 sed -i -e '/^#!\//, 1d' resources/default_tweaks.py
 
 chmod -x src/calibre/*/*/*/*.py \
     src/calibre/*/*/*.py \
     src/calibre/*/*.py \
-    src/calibre/*.py
+    src/calibre/*.py \
+    src/polyglot/*.py
 
 %build
-OVERRIDE_CFLAGS="%{optflags}" CALIBRE_PY3_PORT=1 %{__python3} setup.py build
+# unbundle MathJax
+%{__rm} -rf resources/mathjax/
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py mathjax --path-to-mathjax %{_jsdir}/mathjax --system-mathjax
+
+OVERRIDE_CFLAGS="%{optflags}" \
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py build
+
+%{__cp} -p src/calibre/plugins/3/* src/calibre/plugins/
 
 %install
 mkdir -p %{buildroot}%{_datadir}
-
-# create directories for xdg-utils
-mkdir -p %{buildroot}%{_datadir}/icons
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor
-mkdir -p %{buildroot}%{_datadir}/packages
-mkdir -p %{buildroot}%{_datadir}/mime
-mkdir -p %{buildroot}%{_datadir}/mime/packages
-mkdir -p %{buildroot}%{_datadir}/applications
-mkdir -p %{buildroot}%{_datadir}/desktop-directories
 
 # create directory for calibre environment module
 # the install script assumes it's there.
@@ -168,13 +178,14 @@ mkdir -p %{buildroot}%{python3_sitelib}
 mkdir -p %{buildroot}%{_datadir}/bash-completion/completions
 mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 
-XDG_DATA_DIRS="%{buildroot}%{_datadir}" \
-XDG_UTILS_INSTALL_MODE="system" \
-LIBPATH="%{_libdir}" \
-CALIBRE_PY3_PORT=1 %{__python3} setup.py install \
-    --root=%{buildroot}%{_prefix} \
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py install \
     --prefix=%{_prefix} \
+    --bindir=%{_bindir} \
     --libdir=%{_libdir} \
+    --sharedir=%{_datadir} \
+    --staging-root=%{buildroot}%{_prefix} \
+    --staging-bindir=%{buildroot}%{_bindir} \
     --staging-libdir=%{buildroot}%{_libdir} \
     --staging-sharedir=%{buildroot}%{_datadir}
 
@@ -194,15 +205,8 @@ cp -p resources/images/viewer.png \
 cp -p resources/images/tweak.png \
    %{buildroot}%{_datadir}/pixmaps/calibre-ebook-edit.png
 
-# every file is empty here
-find %{buildroot}%{_datadir}/mime -maxdepth 1 -type f -print -delete
-
-# packages aren't allowed to register mimetypes like this
-rm -f %{buildroot}%{_datadir}/applications/defaults.list
-rm -f %{buildroot}%{_datadir}/applications/mimeinfo.cache
-rm -f %{buildroot}%{_datadir}/mime/application/*.xml
-rm -f %{buildroot}%{_datadir}/mime/text/*.xml
-
+desktop-file-validate \
+    %{buildroot}%{_datadir}/applications/calibre-ebook-edit.desktop
 desktop-file-validate \
     %{buildroot}%{_datadir}/applications/calibre-ebook-viewer.desktop
 desktop-file-validate \
@@ -210,18 +214,12 @@ desktop-file-validate \
 desktop-file-validate \
     %{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
 
-# mimetype icon for lrf
-rm -rf %{buildroot}%{_datadir}/icons/hicolor/128x128
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
-cp -p resources/images/mimetypes/lrf.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes/application-x-sony-bbeb.png
-cp -p resources/images/viewer.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/calibre-viewer.png
-
 # these are provided as separate packages
 rm -rf %{buildroot}%{_libdir}/%{name}/odf
+
+# these are not required at runtime
+rm -rf %{buildroot}%{_libdir}/%{name}/backports/
+rm -rf %{buildroot}%{_datadir}/%{name}/rapydscript/
 
 # link to system fonts after we have deleted (see Source0) the non-free ones
 # http://bugs.calibre-ebook.com/ticket/3832
@@ -250,20 +248,14 @@ ln -s %{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
 ln -s %{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Regular.ttf
 
-# delete locales, calibre stores them in a zip file now
-rm -rf %{buildroot}%{_datadir}/%{name}/localization/locales/
-
-rm -f %{buildroot}%{_bindir}/%{name}-uninstall
-
 cp -p %{SOURCE2} %{buildroot}%{_bindir}/calibre-mount-helper
 
 # Remove these 2 appdata files, we can only include one
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-edit.appdata.xml
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-viewer.appdata.xml
 
+%check
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-gui.appdata.xml
-
-#%%check
 #CALIBRE_PY3_PORT=1 %%{__python3} setup.py test
 
 %files
@@ -304,6 +296,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Sat May 25 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190525git10f57cf
+- Cleanup
+
 * Tue May 21 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190521gitb8832d5
 - Update to current git head
 
