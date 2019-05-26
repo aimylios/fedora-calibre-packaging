@@ -4,22 +4,13 @@
 
 Name:           calibre
 Version:        3.43.0
-Release:        0.1.20190525git10f57cf%{?dist}
+Release:        0.1.20190526gitf3b64df%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
-URL:            http://calibre-ebook.com/
+URL:            https://calibre-ebook.com/
 
-# SourceURL: curl -L http://code.calibre-ebook.com/dist/src > calibre-%%{version}.tar.xz
-# Upstream packages some unfree fonts which we cannot redistribute.
-# While we're at it, also delete the liberation fonts which we already have.
-#
-# Download the upstream tarball and invoke this script while in the tarball's
-# directory:
-# ./getsources.sh %%{version}
+Source0:        https://download.calibre-ebook.com/%{version}/%{name}-%{version}.tar.xz
 
-Source0:        %{name}-%{version}-nofonts.tar.xz
-Source1:        getsources.sh
-Source2:        calibre-mount-helper
 #
 # Disable auto update from inside the app
 #
@@ -30,8 +21,8 @@ Patch1:         %{name}-no-update.patch
 #
 Patch3:         calibre-nodisplay.patch
 
-BuildRequires:  desktop-file-utils
 BuildRequires:  chmlib-devel
+BuildRequires:  desktop-file-utils
 BuildRequires:  fontconfig-devel
 BuildRequires:  glib2-devel
 BuildRequires:  libappstream-glib
@@ -61,7 +52,6 @@ BuildRequires:  xdg-utils
 #BuildRequires:  jxrlib
 #BuildRequires:  libjpeg-turbo-utils
 #BuildRequires:  optipng
-#BuildRequires:  python2-libs
 #BuildRequires:  python3-dukpy
 #BuildRequires:  python3-feedparser
 #BuildRequires:  python3-html2text
@@ -137,34 +127,29 @@ RTF, TXT, PDF and LRS.
 %autosetup -n %{name}-%{version} -p1
 
 # remove shebangs
+sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*.py
 sed -i -e '/^#!\//, 1d' src/css_selectors/*.py
+sed -i -e '/^#!\//, 1d' src/duktape/*.py
 sed -i -e '/^#!\//, 1d' src/lzma/*.py
 sed -i -e '/^#!\//, 1d' src/polyglot/*.py
 sed -i -e '/^#!\//, 1d' src/templite/*.py
+sed -i -e '/^#!\//, 1d' src/tinycss/*/*.py
 sed -i -e '/^#!\//, 1d' src/tinycss/*.py
 sed -i -e '/^#!\//, 1d' resources/default_tweaks.py
 
-chmod -x src/calibre/*/*/*/*.py \
-    src/calibre/*/*/*.py \
-    src/calibre/*/*.py \
-    src/calibre/*.py \
-    src/polyglot/*.py
-
 %build
 # unbundle MathJax
-%{__rm} -rf resources/mathjax/
+rm -rf resources/mathjax/
 CALIBRE_PY3_PORT=1 \
 %{__python3} setup.py mathjax --path-to-mathjax %{_jsdir}/mathjax --system-mathjax
 
 OVERRIDE_CFLAGS="%{optflags}" \
 CALIBRE_PY3_PORT=1 \
 %{__python3} setup.py build
-
-%{__cp} -p src/calibre/plugins/3/* src/calibre/plugins/
 
 %install
 mkdir -p %{buildroot}%{_datadir}
@@ -221,8 +206,8 @@ rm -rf %{buildroot}%{_libdir}/%{name}/odf
 rm -rf %{buildroot}%{_libdir}/%{name}/backports/
 rm -rf %{buildroot}%{_datadir}/%{name}/rapydscript/
 
-# link to system fonts after we have deleted (see Source0) the non-free ones
-# http://bugs.calibre-ebook.com/ticket/3832
+# unbundle Liberation Fonts
+rm -f %{buildroot}%{_datadir}/%{name}/fonts/liberation/*
 ln -s %{_datadir}/fonts/liberation/LiberationMono-BoldItalic.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-BoldItalic.ttf
 ln -s %{_datadir}/fonts/liberation/LiberationMono-Bold.ttf \
@@ -248,19 +233,18 @@ ln -s %{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
 ln -s %{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Regular.ttf
 
-cp -p %{SOURCE2} %{buildroot}%{_bindir}/calibre-mount-helper
-
 # Remove these 2 appdata files, we can only include one
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-edit.appdata.xml
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-viewer.appdata.xml
 
-%check
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-gui.appdata.xml
+
+#%%check
 #CALIBRE_PY3_PORT=1 %%{__python3} setup.py test
 
 %files
-%license COPYRIGHT LICENSE
-%doc Changelog.yaml
+%license LICENSE
+%doc README.md COPYRIGHT Changelog.yaml
 %{_bindir}/calibre
 %{_bindir}/calibre-complete
 %{_bindir}/calibre-customize
@@ -268,7 +252,6 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_bindir}/calibre-parallel
 %{_bindir}/calibre-server
 %{_bindir}/calibre-smtp
-%{_bindir}/calibre-mount-helper
 %{_bindir}/calibredb
 %{_bindir}/ebook-convert
 %{_bindir}/ebook-device
@@ -296,6 +279,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Sun May 26 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190526gitf3b64df
+- Cleanup
+
 * Sat May 25 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190525git10f57cf
 - Cleanup
 
