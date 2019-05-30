@@ -1,27 +1,16 @@
 %{?_sip_api:Requires: sip-api(%{_sip_api_major}) >= %{_sip_api}}
 
-%global __provides_exclude_from ^%{_libdir}/%{name}/%{name}/plugins/.*\.so$
-
-%global _python_bytecompile_extra 0
+%global __provides_exclude_from ^%{_libdir}/%{name}/%{name}/plugins/3/.*\.so$
 
 Name:           calibre
-Version:        3.36.0
-Release:        4%{?dist}
+Version:        3.43.0
+Release:        1%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
-URL:            http://calibre-ebook.com/
+URL:            https://calibre-ebook.com/
 
-# SourceURL: curl -L http://code.calibre-ebook.com/dist/src > calibre-%%{version}.tar.xz
-# Upstream packages some unfree fonts which we cannot redistribute.
-# While we're at it, also delete the liberation fonts which we already have.
-#
-# Download the upstream tarball and invoke this script while in the tarball's
-# directory:
-# ./getsources.sh %%{version}
+Source0:        https://download.calibre-ebook.com/%{version}/%{name}-%{version}.tar.xz
 
-Source0:        %{name}-%{version}-nofonts.tar.xz
-Source1:        getsources.sh
-Source2:        calibre-mount-helper
 #
 # Disable auto update from inside the app
 #
@@ -32,46 +21,33 @@ Patch1:         %{name}-no-update.patch
 #
 Patch3:         calibre-nodisplay.patch
 
-BuildRequires:  python2 >= 2.7
-BuildRequires:  python2-devel >= 2.7
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-qt5-devel
-BuildRequires:  python2-qt5
-BuildRequires:  python2-qt5-webkit
-BuildRequires:  podofo-devel
-BuildRequires:  desktop-file-utils
-BuildRequires:  python2-mechanize
-BuildRequires:  python2-lxml
-BuildRequires:  python2-dateutil
-BuildRequires:  python2-imaging
-BuildRequires:  xdg-utils
-BuildRequires:  python2-beautifulsoup
 BuildRequires:  chmlib-devel
-BuildRequires:  python2-cssutils >= 0.9.9
-BuildRequires:  sqlite-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libmtp-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  web-assets-devel
-BuildRequires:  qt5-qtbase-static
-BuildRequires:  libXrender-devel
-BuildRequires:  systemd-devel
-BuildRequires:  qt5-qtwebkit-devel
-BuildRequires:  openssl-devel
-# calibre installer is so smart that it check for the presence of the
-# directory (and then installs in the wrong place)
-BuildRequires:  bash-completion
-BuildRequires:  python2-apsw
-BuildRequires:  python2-enum34
-BuildRequires:  glib2-devel
+BuildRequires:  desktop-file-utils
 BuildRequires:  fontconfig-devel
-BuildRequires:  libinput-devel
-BuildRequires:  libxkbcommon-devel
-BuildRequires:  python2-msgpack
-BuildRequires:  python2-regex
-BuildRequires:  python2-html5-parser
+BuildRequires:  glib2-devel
 BuildRequires:  libappstream-glib
+BuildRequires:  libicu-devel
+BuildRequires:  libmtp-devel
+BuildRequires:  mathjax
+BuildRequires:  openssl-devel
+BuildRequires:  podofo-devel
+BuildRequires:  python3-apsw
+BuildRequires:  python3-beautifulsoup4
+BuildRequires:  python3-css-parser
+BuildRequires:  python3-dateutil
+BuildRequires:  python3-devel
+BuildRequires:  python3-html5-parser
+BuildRequires:  python3-msgpack
+BuildRequires:  python3-pillow
+BuildRequires:  python3-qt5-devel
+BuildRequires:  python3-qt5-webkit
+BuildRequires:  python3-regex
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-static
+BuildRequires:  sip
+BuildRequires:  sqlite-devel
+BuildRequires:  web-assets-devel
+BuildRequires:  xdg-utils
 
 %{?pyqt5_requires}
 # once ^^ %%pyqt5_requires is everywhere, can drop python-qt5 dep below -- rex
@@ -83,35 +59,37 @@ BuildRequires:  libappstream-glib
 BuildRequires:  qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
-Requires:       python2-qt5
-Requires:       python2-qt5-webkit
-Requires:       qt5-qtwebkit
-Requires:       qt5-qtsvg
-Requires:       qt5-qtsensors
-Requires:       python2-cssutils
-Requires:       python2-odfpy
-Requires:       python2-lxml
-Requires:       python2-imaging
-Requires:       python2-mechanize
-Requires:       python2-dateutil
-Requires:       python2-beautifulsoup
-Requires:       poppler-utils
-# Require the packages of the files which are symlinked by calibre
+Requires:       jxrlib
+Requires:       liberation-mono-fonts
 Requires:       liberation-sans-fonts
 Requires:       liberation-serif-fonts
-Requires:       liberation-mono-fonts
-Requires:       python2-feedparser
-Requires:       python2-netifaces
-Requires:       python2-dns
-Requires:       python2-apsw
+Requires:       libjpeg-turbo-utils
 Requires:       mathjax
-Requires:       python2-psutil
-Requires:       python2-pygments
 Requires:       optipng
-Requires:       python2-msgpack
-Requires:       python2-regex
-Requires:       python2-html5-parser
-Requires:       python2-enum34
+Requires:       poppler-utils
+Requires:       python3-apsw
+Requires:       python3-beautifulsoup4
+Requires:       python3-css-parser
+Requires:       python3-dateutil
+Requires:       python3-dbus
+Requires:       python3-dns
+Requires:       python3-feedparser
+Requires:       python3-html2text
+Requires:       python3-html5-parser
+Requires:       python3-html5lib
+Requires:       python3-lxml
+Requires:       python3-markdown
+Requires:       python3-mechanize
+Requires:       python3-msgpack
+Requires:       python3-netifaces
+Requires:       python3-odfpy
+Requires:       python3-pillow
+Requires:       python3-psutil
+Requires:       python3-pygments
+Requires:       python3-qt5
+Requires:       python3-qt5-webkit
+Requires:       python3-regex
+Requires:       python3-zeroconf
 
 %description
 Calibre is meant to be a complete e-library solution. It includes library
@@ -131,60 +109,63 @@ RTF, TXT, PDF and LRS.
 %autosetup -n %{name}-%{version} -p1
 
 # remove shebangs
+sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*.py
-sed -i -e '/^#![ ]*\//, 1d' src/calibre/*/*.py
+sed -i -e '/^#!\//, 1d' src/calibre/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*.py
+sed -i -e '/^#!\//, 1d' src/css_selectors/*.py
+sed -i -e '/^#!\//, 1d' src/duktape/*.py
+sed -i -e '/^#!\//, 1d' src/lzma/*.py
+sed -i -e '/^#!\//, 1d' src/polyglot/*.py
 sed -i -e '/^#!\//, 1d' src/templite/*.py
+sed -i -e '/^#!\//, 1d' src/tinycss/*/*.py
+sed -i -e '/^#!\//, 1d' src/tinycss/*.py
 sed -i -e '/^#!\//, 1d' resources/default_tweaks.py
-sed -i -e '/^#!\//, 1d' resources/catalog/section_list_templates.py
 
-chmod -x src/calibre/*/*/*/*.py \
-    src/calibre/*/*/*.py \
-    src/calibre/*/*.py \
-    src/calibre/*.py
-
-rm -rvf resources/viewer/mathjax
+# remove bundled MathJax
+rm -rf resources/mathjax/
 
 %build
-OVERRIDE_CFLAGS="%{optflags}" %__python2 setup.py build
+# unbundle MathJax
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py mathjax \
+    --system-mathjax \
+    --path-to-mathjax %{_jsdir}/mathjax/
+
+OVERRIDE_CFLAGS="%{optflags}" \
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py build
 
 %install
 mkdir -p %{buildroot}%{_datadir}
 
-# create directories for xdg-utils
-mkdir -p %{buildroot}%{_datadir}/icons
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor
-mkdir -p %{buildroot}%{_datadir}/packages
-mkdir -p %{buildroot}%{_datadir}/mime
-mkdir -p %{buildroot}%{_datadir}/mime/packages
-mkdir -p %{buildroot}%{_datadir}/applications
-mkdir -p %{buildroot}%{_datadir}/desktop-directories
-
 # create directory for calibre environment module
 # the install script assumes it's there.
-mkdir -p %{buildroot}%{python2_sitelib}
+mkdir -p %{buildroot}%{python3_sitelib}
 
 # create directory for completion files, so calibre knows where
 # to install them
 mkdir -p %{buildroot}%{_datadir}/bash-completion/completions
 mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 
-XDG_DATA_DIRS="%{buildroot}%{_datadir}" \
-XDG_UTILS_INSTALL_MODE="system" \
-LIBPATH="%{_libdir}" \
-%__python2 setup.py install --root=%{buildroot}%{_prefix} \
-                            --prefix=%{_prefix} \
-                            --libdir=%{_libdir} \
-                            --staging-libdir=%{buildroot}%{_libdir} \
-                            --staging-sharedir=%{buildroot}%{_datadir}
+CALIBRE_PY3_PORT=1 \
+%{__python3} setup.py install \
+    --prefix=%{_prefix} \
+    --bindir=%{_bindir} \
+    --libdir=%{_libdir} \
+    --sharedir=%{_datadir} \
+    --staging-root=%{buildroot}%{_prefix} \
+    --staging-bindir=%{buildroot}%{_bindir} \
+    --staging-libdir=%{buildroot}%{_libdir} \
+    --staging-sharedir=%{buildroot}%{_datadir}
 
 # remove shebang from init_calibre.py here because
 # it just got spawned by the install script
-sed -i -e '/^#!\//, 1d' %{buildroot}%{python2_sitelib}/init_calibre.py
+sed -i -e '/^#!\//, 1d' %{buildroot}%{python3_sitelib}/init_calibre.py
 
 # there are some python files there, do byte-compilation on them
-%py_byte_compile %{__python2} %{buildroot}%{_datadir}/%{name}
+%py_byte_compile %{__python3} %{buildroot}%{_datadir}/%{name}
 
 # icons
 mkdir -p %{buildroot}%{_datadir}/pixmaps/
@@ -195,47 +176,24 @@ cp -p resources/images/viewer.png                 \
 cp -p resources/images/tweak.png                 \
    %{buildroot}%{_datadir}/pixmaps/calibre-ebook-edit.png
 
-# every file is empty here
-find %{buildroot}%{_datadir}/mime -maxdepth 1 -type f -print -delete
-
-# packages aren't allowed to register mimetypes like this
-rm -f %{buildroot}%{_datadir}/applications/defaults.list
-rm -f %{buildroot}%{_datadir}/applications/mimeinfo.cache
-rm -f %{buildroot}%{_datadir}/mime/application/*.xml
-rm -f %{buildroot}%{_datadir}/mime/text/*.xml
-
+# check desktop files
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-ebook-viewer.desktop
+    %{buildroot}%{_datadir}/applications/calibre-ebook-edit.desktop
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-gui.desktop
+    %{buildroot}%{_datadir}/applications/calibre-ebook-viewer.desktop
 desktop-file-validate \
-%{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
-
-# mimetype icon for lrf
-rm -rf %{buildroot}%{_datadir}/icons/hicolor/128x128
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
-cp -p resources/images/mimetypes/lrf.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes/application-x-sony-bbeb.png
-cp -p resources/images/viewer.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/calibre-viewer.png
+    %{buildroot}%{_datadir}/applications/calibre-gui.desktop
+desktop-file-validate \
+    %{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
 
 # these are provided as separate packages
 rm -rf %{buildroot}%{_libdir}/%{name}/odf
 
-# rm empty feedparser files.
-rm -rf %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.*
+# these are not required for Python 3
+rm -rf %{buildroot}%{_libdir}/%{name}/backports/
 
-ln -s %{python2_sitelib}/feedparser.py \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.py
-ln -s %{python2_sitelib}/feedparser.pyc \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.pyc
-ln -s %{python2_sitelib}/feedparser.pyo \
-      %{buildroot}%{_libdir}/%{name}/%{name}/web/feeds/feedparser.pyo
-
-# link to system fonts after we have deleted (see Source0) the non-free ones
-# http://bugs.calibre-ebook.com/ticket/3832
+# unbundle Liberation Fonts
+rm -f %{buildroot}%{_datadir}/%{name}/fonts/liberation/*
 ln -s %{_datadir}/fonts/liberation/LiberationMono-BoldItalic.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-BoldItalic.ttf
 ln -s %{_datadir}/fonts/liberation/LiberationMono-Bold.ttf \
@@ -261,27 +219,15 @@ ln -s %{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
 ln -s %{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Regular.ttf
 
-# delete locales, calibre stores them in a zip file now
-rm -rf %{buildroot}%{_datadir}/%{name}/localization/locales/
-
-rm -f %{buildroot}%{_bindir}/%{name}-uninstall
-
-cp -p %{SOURCE2} %{buildroot}%{_bindir}/calibre-mount-helper
-
 # Remove these 2 appdata files, we can only include one
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-edit.appdata.xml
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-viewer.appdata.xml
 
 appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-gui.appdata.xml
 
-%preun
-rm %{_datadir}/%{name}/viewer/mathjax
-
-%posttrans
-ln -s %{_jsdir}/mathjax %{_datadir}/%{name}/viewer/
-
 %files
-%doc COPYRIGHT LICENSE Changelog.yaml
+%license LICENSE
+%doc README.md COPYRIGHT Changelog.yaml
 %{_bindir}/calibre
 %{_bindir}/calibre-complete
 %{_bindir}/calibre-customize
@@ -289,11 +235,12 @@ ln -s %{_jsdir}/mathjax %{_datadir}/%{name}/viewer/
 %{_bindir}/calibre-parallel
 %{_bindir}/calibre-server
 %{_bindir}/calibre-smtp
-%{_bindir}/calibre-mount-helper
 %{_bindir}/calibredb
 %{_bindir}/ebook-convert
 %{_bindir}/ebook-device
+%{_bindir}/ebook-edit
 %{_bindir}/ebook-meta
+%{_bindir}/ebook-polish
 %{_bindir}/ebook-viewer
 %{_bindir}/fetch-ebook-metadata
 %{_bindir}/lrf2lrs
@@ -301,21 +248,24 @@ ln -s %{_jsdir}/mathjax %{_datadir}/%{name}/viewer/
 %{_bindir}/lrs2lrf
 %{_bindir}/markdown-calibre
 %{_bindir}/web2disk
-%{_bindir}/ebook-polish
-%{_bindir}/ebook-edit
 %{_libdir}/%{name}
+%{python3_sitelib}/init_calibre.*
+%{python3_sitelib}/__pycache__/init_calibre.*
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 %{_datadir}/mime/packages/*
 %{_datadir}/icons/hicolor/*/mimetypes/*
 %{_datadir}/icons/hicolor/*/apps/*
-%{python2_sitelib}/init_calibre.py*
 %{_datadir}/bash-completion/completions/%{name}
 %{_datadir}/zsh/site-functions/_%{name}
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Thu May 30 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-1
+- Update to 3.43.0. Fixes bug 1667497
+- Switch to Python 3
+
 * Sun Mar 03 2019 Kevin Fenzi <kevin@scrye.com> - 3.36.0-4
 - Rebuild for new qt5.
 
