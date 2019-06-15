@@ -1,10 +1,10 @@
 %{?_sip_api:Requires: sip-api(%{_sip_api_major}) >= %{_sip_api}}
 
-%global __provides_exclude_from ^%{_libdir}/%{name}/%{name}/plugins/.*\.so$
+%global __provides_exclude_from ^%{_libdir}/%{name}/%{name}/plugins/3/.*\.so$
 
 Name:           calibre
-Version:        3.43.0
-Release:        0.1.20190526gitf3b64df%{?dist}
+Version:        3.45.0
+Release:        0.1.20190615gitd782fa0%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            https://calibre-ebook.com/
@@ -44,7 +44,6 @@ BuildRequires:  python3-qt5-webkit
 BuildRequires:  python3-regex
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qtbase-static
-BuildRequires:  sip
 BuildRequires:  sqlite-devel
 BuildRequires:  web-assets-devel
 BuildRequires:  xdg-utils
@@ -90,6 +89,7 @@ Requires:       python3-css-parser
 Requires:       python3-dateutil
 Requires:       python3-dbus
 Requires:       python3-dns
+Requires:       python3-dukpy
 Requires:       python3-feedparser
 Requires:       python3-html2text
 Requires:       python3-html5-parser
@@ -106,7 +106,6 @@ Requires:       python3-pygments
 Requires:       python3-qt5
 Requires:       python3-qt5-webkit
 Requires:       python3-regex
-Requires:       python3-soupsieve
 Requires:       python3-zeroconf
 
 %description
@@ -141,11 +140,15 @@ sed -i -e '/^#!\//, 1d' src/tinycss/*/*.py
 sed -i -e '/^#!\//, 1d' src/tinycss/*.py
 sed -i -e '/^#!\//, 1d' resources/default_tweaks.py
 
+# remove bundled MathJax
+rm -rf resources/mathjax/
+
 %build
 # unbundle MathJax
-rm -rf resources/mathjax/
 CALIBRE_PY3_PORT=1 \
-%{__python3} setup.py mathjax --path-to-mathjax %{_jsdir}/mathjax --system-mathjax
+%{__python3} setup.py mathjax \
+    --system-mathjax \
+    --path-to-mathjax %{_jsdir}/mathjax/
 
 OVERRIDE_CFLAGS="%{optflags}" \
 CALIBRE_PY3_PORT=1 \
@@ -190,6 +193,7 @@ cp -p resources/images/viewer.png \
 cp -p resources/images/tweak.png \
    %{buildroot}%{_datadir}/pixmaps/calibre-ebook-edit.png
 
+# check desktop files
 desktop-file-validate \
     %{buildroot}%{_datadir}/applications/calibre-ebook-edit.desktop
 desktop-file-validate \
@@ -255,7 +259,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_bindir}/calibredb
 %{_bindir}/ebook-convert
 %{_bindir}/ebook-device
+%{_bindir}/ebook-edit
 %{_bindir}/ebook-meta
+%{_bindir}/ebook-polish
 %{_bindir}/ebook-viewer
 %{_bindir}/fetch-ebook-metadata
 %{_bindir}/lrf2lrs
@@ -263,22 +269,23 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_bindir}/lrs2lrf
 %{_bindir}/markdown-calibre
 %{_bindir}/web2disk
-%{_bindir}/ebook-polish
-%{_bindir}/ebook-edit
 %{_libdir}/%{name}
+%{python3_sitelib}/init_calibre.*
+%{python3_sitelib}/__pycache__/init_calibre.*
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 %{_datadir}/mime/packages/*
 %{_datadir}/icons/hicolor/*/mimetypes/*
 %{_datadir}/icons/hicolor/*/apps/*
-%{python3_sitelib}/init_calibre.*
-%{python3_sitelib}/__pycache__/init_calibre.*
 %{_datadir}/bash-completion/completions/%{name}
 %{_datadir}/zsh/site-functions/_%{name}
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Sat Jun 15 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190615gitd782fa0
+- Minor cleanup
+
 * Sun May 26 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190526gitf3b64df
 - Cleanup
 
