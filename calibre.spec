@@ -4,7 +4,7 @@
 
 Name:           calibre
 Version:        3.45.0
-Release:        0.1.20190621gitabd9e6b%{?dist}
+Release:        0.1.20190627git0d1ab93%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            https://calibre-ebook.com/
@@ -61,7 +61,6 @@ BuildRequires:  xdg-utils
 #BuildRequires:  python3-psutil
 #BuildRequires:  python3-pygments
 #BuildRequires:  python3-sgmllib
-#BuildRequires:  python3-soupsieve
 #BuildRequires:  python3-unrardll
 #BuildRequires:  python3-zeroconf
 
@@ -212,6 +211,32 @@ rm -rf %{buildroot}%{_datadir}/%{name}/rapydscript/
 
 # unbundle Liberation Fonts
 rm -f %{buildroot}%{_datadir}/%{name}/fonts/liberation/*
+%if 0%{?fedora} > 30
+ln -s %{_datadir}/fonts/liberation-mono/LiberationMono-BoldItalic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-BoldItalic.ttf
+ln -s %{_datadir}/fonts/liberation-mono/LiberationMono-Bold.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-Bold.ttf
+ln -s %{_datadir}/fonts/liberation-mono/LiberationMono-Italic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-Italic.ttf
+ln -s %{_datadir}/fonts/liberation-mono/LiberationMono-Regular.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-Regular.ttf
+ln -s %{_datadir}/fonts/liberation-sans/LiberationSans-BoldItalic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSans-BoldItalic.ttf
+ln -s %{_datadir}/fonts/liberation-sans/LiberationSans-Bold.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSans-Bold.ttf
+ln -s %{_datadir}/fonts/liberation-sans/LiberationSans-Italic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSans-Italic.ttf
+ln -s %{_datadir}/fonts/liberation-sans/LiberationSans-Regular.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSans-Regular.ttf
+ln -s %{_datadir}/fonts/liberation-serif/LiberationSerif-BoldItalic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-BoldItalic.ttf
+ln -s %{_datadir}/fonts/liberation-serif/LiberationSerif-Bold.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Bold.ttf
+ln -s %{_datadir}/fonts/liberation-serif/LiberationSerif-Italic.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Italic.ttf
+ln -s %{_datadir}/fonts/liberation-serif/LiberationSerif-Regular.ttf \
+      %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Regular.ttf
+%else
 ln -s %{_datadir}/fonts/liberation/LiberationMono-BoldItalic.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationMono-BoldItalic.ttf
 ln -s %{_datadir}/fonts/liberation/LiberationMono-Bold.ttf \
@@ -236,6 +261,7 @@ ln -s %{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Italic.ttf
 ln -s %{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
       %{buildroot}%{_datadir}/%{name}/fonts/liberation/LiberationSerif-Regular.ttf
+%endif
 
 # Remove these 2 appdata files, we can only include one
 rm -f %{buildroot}/%{_datadir}/metainfo/calibre-ebook-edit.appdata.xml
@@ -283,24 +309,18 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
-* Fri Jun 21 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190621gitabd9e6b
+* Fri Jun 28 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190627git0d1ab93
 - Update to current git head
-
-* Sat Jun 15 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190615gitd782fa0
-- Minor cleanup
-
-* Sun May 26 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190526gitf3b64df
-- Cleanup
-
-* Sat May 25 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190525git10f57cf
-- Cleanup
-
-* Tue May 21 2019 Xxx Xxx <xxx@xxx.xxx> - 3.43.0-0.1.20190521gitb8832d5
-- Update to current git head
-
-* Sun May 19 2019 Xxx Xxx <xxx@xxx.xxx> - 3.42.0-1
-- Update to 3.42.0.
 - Switch from Python 2 to Python 3
+
+* Tue Jun 25 2019 Kevin Fenzi <kevin@scrye.com> - 3.36.0-7
+- Adjust for liberation fonts moving around.
+
+* Mon Jun 17 2019 Jan Grulich <jgrulich@redhat.com> - 3.36.0-6
+- rebuild (qt5)
+
+* Sat Jun 15 2019 Kevin Fenzi <kevin@scrye.com> - 3.36.0-5
+- Rebuild for new qt5.
 
 * Sun Mar 03 2019 Kevin Fenzi <kevin@scrye.com> - 3.36.0-4
 - Rebuild for new qt5.
