@@ -4,7 +4,7 @@
 
 Name:           calibre
 Version:        3.45.0
-Release:        0.1.20190615gitd782fa0%{?dist}
+Release:        0.1.20190621gitabd9e6b%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            https://calibre-ebook.com/
@@ -283,6 +283,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Fri Jun 21 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190621gitabd9e6b
+- Update to current git head
+
 * Sat Jun 15 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190615gitd782fa0
 - Minor cleanup
 
