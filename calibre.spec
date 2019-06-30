@@ -4,7 +4,7 @@
 
 Name:           calibre
 Version:        3.45.0
-Release:        0.1.20190627git0d1ab93%{?dist}
+Release:        0.1.20190630git465ca05%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            https://calibre-ebook.com/
@@ -309,7 +309,7 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
-* Fri Jun 28 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190627git0d1ab93
+* Sun Jun 30 2019 Xxx Xxx <xxx@xxx.xxx> - 3.45.0-0.1.20190630git465ca05
 - Update to current git head
 - Switch from Python 2 to Python 3
 
