@@ -6,21 +6,12 @@
 
 Name:           calibre
 Version:        4.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        E-book converter and library manager
 License:        GPLv3
 URL:            https://calibre-ebook.com/
 
-# SourceURL: curl -L http://code.calibre-ebook.com/dist/src > calibre-%%{version}.tar.xz
-# Upstream packages some unfree fonts which we cannot redistribute.
-# While we're at it, also delete the liberation fonts which we already have.
-#
-# Download the upstream tarball and invoke this script while in the tarball's
-# directory:
-# ./getsources.sh %%{version}
-
-Source0:        calibre-%{version}-nofonts.tar.xz
-Source1:        getsources.sh
+Source0:        https://download.calibre-ebook.com/%{version}/%{name}-%{version}.tar.xz
 
 # Disable auto update from inside the app
 Patch1:         calibre-no-update.patch
@@ -32,61 +23,51 @@ Patch3:         calibre-nodisplay.patch
 # Patches that are not suitable for upstream:
 # skip unrardll tests if unrardll has been removed.
 Patch4:         https://github.com/keszybz/calibre/commit/497810f8adb992bfecf04e8eacf4ac1340ee6fe0.patch
-# sgml was removed, so disable test for it.
-Patch5:         https://github.com/keszybz/calibre/commit/01bf854923741bf8d6a6328f17d61e0ec5ac3c9f.patch
 
-ExclusiveArch: %{qt5_qtwebengine_arches}
+ExclusiveArch:  %{qt5_qtwebengine_arches}
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-qt5-devel
-BuildRequires:  python3-qt5
-BuildRequires:  podofo-devel
-BuildRequires:  desktop-file-utils
-BuildRequires:  xdg-utils
 BuildRequires:  chmlib-devel
-BuildRequires:  sqlite-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libmtp-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  web-assets-devel
-BuildRequires:  qt5-qtbase-static
-BuildRequires:  libXrender-devel
-BuildRequires:  openssl-devel
-# calibre installer is so smart that it check for the presence of the
-# directory (and then installs in the wrong place)
-BuildRequires:  bash-completion
-BuildRequires:  glib2-devel
+BuildRequires:  desktop-file-utils
 BuildRequires:  fontconfig-devel
-BuildRequires:  libinput-devel
-BuildRequires:  libxkbcommon-devel
+BuildRequires:  glib2-devel
+BuildRequires:  hunspell-devel
+BuildRequires:  hyphen-devel
 BuildRequires:  libappstream-glib
-BuildRequires:  optipng
+BuildRequires:  libicu-devel
+BuildRequires:  libmtp-devel
+BuildRequires:  mathjax
+BuildRequires:  openssl-devel
+BuildRequires:  podofo-devel
+BuildRequires:  python3-devel
+BuildRequires:  python3-qt5-devel
+BuildRequires:  python3-qt5-webengine
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtbase-static
+BuildRequires:  qt5-qtwebengine-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  web-assets-devel
+BuildRequires:  xdg-utils
 BuildRequires:  python3dist(apsw)
-BuildRequires:  python3dist(mechanize)
-BuildRequires:  python3dist(lxml)
-BuildRequires:  python3dist(python-dateutil)
-BuildRequires:  python3dist(pillow)
-BuildRequires:  python3dist(css-parser)
-BuildRequires:  python3dist(feedparser)
-BuildRequires:  python3dist(netifaces)
 BuildRequires:  python3dist(beautifulsoup4)
+BuildRequires:  python3dist(css-parser)
+BuildRequires:  python3dist(html5-parser)
+BuildRequires:  python3dist(lxml)
+BuildRequires:  python3dist(msgpack)
+BuildRequires:  python3dist(pillow)
+BuildRequires:  python3dist(python-dateutil)
+BuildRequires:  python3dist(regex)
+# for tests
+BuildRequires:  optipng
+BuildRequires:  python3-sgmllib
+BuildRequires:  python3dist(feedparser)
+BuildRequires:  python3dist(html2text)
+BuildRequires:  python3dist(markdown)
+BuildRequires:  python3dist(mechanize)
+BuildRequires:  python3dist(netifaces)
 BuildRequires:  python3dist(psutil)
 BuildRequires:  python3dist(pygments)
-BuildRequires:  python3dist(soupsieve)
-BuildRequires:  python3dist(msgpack)
-BuildRequires:  python3dist(regex)
-BuildRequires:  python3dist(html5-parser) >= 0.4.8
-BuildRequires:  python3dist(html2text)
 BuildRequires:  python3dist(zeroconf)
-BuildRequires:  python3dist(markdown) >= 3.0
-BuildRequires:  hunspell-devel
-BuildRequires:  qt5-qtwebengine-devel
-BuildRequires:  python-qt5-webengine
-BuildRequires:  hyphen-devel
-BuildRequires:  mathjax
-# Those are only used for tests. Do not add to runtime deps.
+# Those are only used for tests. Do not add to runtime deps. -> WRONG?
 BuildRequires:  /usr/bin/jpegtran
 BuildRequires:  /usr/bin/JxrDecApp
 
@@ -100,37 +81,41 @@ BuildRequires:  /usr/bin/JxrDecApp
 BuildRequires:  qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
-Requires:       python3-qt5
-Requires:       python-qt5-webengine
-Requires:       qt5-qtwebengine
-Requires:       qt5-qtsvg
-Requires:       qt5-qtsensors
-Requires:       poppler-utils
+Requires:       jxrlib
+Requires:       liberation-mono-fonts
 Requires:       liberation-sans-fonts
 Requires:       liberation-serif-fonts
-Requires:       liberation-mono-fonts
+Requires:       libjpeg-turbo-utils
 Requires:       mathjax
 Requires:       optipng
-Requires:       python3dist(odfpy)
-Requires:       python3dist(lxml)
-Requires:       python3dist(pillow)
-Requires:       python3dist(mechanize)
-Requires:       python3dist(python-dateutil)
-Requires:       python3dist(beautifulsoup4)
-Requires:       python3dist(soupsieve)
-Requires:       python3dist(css-parser)
-Requires:       python3dist(feedparser)
-Requires:       python3dist(netifaces)
-Requires:       python3dist(dnspython)
+Requires:       poppler-utils
+Requires:       python3-qt5
+Requires:       python3-qt5-webengine
+Requires:       qt5-qtwebengine
 Requires:       python3dist(apsw)
+Requires:       python3dist(beautifulsoup4)
+Requires:       python3dist(css-parser)
+Requires:       python3dist(python-dateutil)
+Requires:       python3dist(dbus)
+Requires:       python3dist(dnspython)
+Requires:       python3dist(feedparser)
+Requires:       python3dist(html2text)
+Requires:       python3dist(html5-parser)
+Requires:       python3dist(html5lib)
+Requires:       python3dist(lxml)
+Requires:       python3dist(markdown)
+Requires:       python3dist(mechanize)
+Requires:       python3dist(msgpack)
+Requires:       python3dist(netifaces)
+Requires:       python3dist(odfpy)
+Requires:       python3dist(pillow)
 Requires:       python3dist(psutil)
 Requires:       python3dist(pygments)
-Requires:       python3dist(msgpack)
 Requires:       python3dist(regex)
-Requires:       python3dist(html5-parser) >= 0.4.8
-Requires:       python3dist(html2text)
-Requires:       python3dist(markdown) >= 3.0
 Recommends:     python3dist(zeroconf)
+
+#Requires:       qt5-qtsvg
+#Requires:       qt5-qtsensors
 
 %description
 Calibre is meant to be a complete e-library solution. It includes library
@@ -155,6 +140,7 @@ sed -i -e '/^#!\//, 1d' src/calibre/*/*/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*/*/*.py
 sed -i -e '/^#![ ]*\//, 1d' src/calibre/*/*.py
 sed -i -e '/^#!\//, 1d' src/calibre/*.py
+sed -i -e '/^#!\//, 1d' src/calibre_lzma/*.py
 sed -i -e '/^#!\//, 1d' src/css_selectors/*.py
 sed -i -e '/^#!\//, 1d' src/polyglot/*.py
 sed -i -e '/^#!\//, 1d' src/templite/*.py
@@ -168,17 +154,15 @@ chmod -x src/calibre/*/*/*/*.py \
     src/calibre/*.py
 
 # remove bundled MathJax
-rm -rvf resources/mathjax
+rm -rf resources/mathjax/
 
-# Skip tests that require removed fonts
-sed -r -i 's/\b(test_actual_case|test_clone|test_file_add|test_file_removal|test_file_rename|test_folder_type_map_case|test_merge_file)\b/_skipped_\1/' src/calibre/ebooks/oeb/polish/tests/container.py
 # Skip test that fails in mock
 sed -r -i 's/\btest_bonjour\b/_skipped_\0/' src/calibre/srv/tests/loop.py
 
 %build
 # unbundle MathJax
 CALIBRE_PY3_PORT=1 \
-%__python3 setup.py mathjax \
+%{__python3} setup.py mathjax \
     --system-mathjax \
     --path-to-mathjax %{_jsdir}/mathjax/
 
@@ -198,14 +182,16 @@ mkdir -p %{buildroot}%{python3_sitelib}
 mkdir -p %{buildroot}%{_datadir}/bash-completion/completions
 mkdir -p %{buildroot}%{_datadir}/zsh/site-functions
 
-LIBPATH="%{_libdir}" \
 CALIBRE_PY3_PORT=1 \
-%__python3 setup.py install --root=%{buildroot}%{_prefix} \
-                            --prefix=%{_prefix} \
-                            --libdir=%{_libdir} \
-                            --staging-root=%{buildroot}%{_prefix} \
-                            --staging-libdir=%{buildroot}%{_libdir} \
-                            --staging-sharedir=%{buildroot}%{_datadir}
+%{__python3} setup.py install \
+    --prefix=%{_prefix} \
+    --bindir=%{_bindir} \
+    --libdir=%{_libdir} \
+    --sharedir=%{_datadir} \
+    --staging-root=%{buildroot}%{_prefix} \
+    --staging-bindir=%{buildroot}%{_bindir} \
+    --staging-libdir=%{buildroot}%{_libdir} \
+    --staging-sharedir=%{buildroot}%{_datadir}
 
 # remove shebang from init_calibre.py here because
 # it just got spawned by the install script
@@ -236,96 +222,89 @@ desktop-file-validate \
     %{buildroot}%{_datadir}/applications/calibre-gui.desktop \
     %{buildroot}%{_datadir}/applications/calibre-lrfviewer.desktop
 
-# mimetype icon for lrf
-rm -rf %{buildroot}%{_datadir}/icons/hicolor/128x128
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
-cp -p resources/images/mimetypes/lrf.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/mimetypes/application-x-sony-bbeb.png
-cp -p resources/images/viewer.png \
-      %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/calibre-viewer.png
-
 # these are provided as separate packages
 rm -rf %{buildroot}%{_libdir}/calibre/odf
 
-# link to system fonts after we have deleted (see Source0) the non-free ones
-# http://bugs.calibre-ebook.com/ticket/3832
+# these are not required at runtime
+rm -rf %{buildroot}%{_libdir}/calibre/backports/
+
+# unbundle Liberation fonts
+rm -f %{buildroot}%{_datadir}/calibre/fonts/liberation/*
 %if 0%{?fedora} >= 31
-# In fedora 31 liberation fonts moved directories.
+# in Fedora 31 Liberation fonts moved directories
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-mono/LiberationMono-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Regular.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-sans/LiberationSans-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Regular.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation-serif/LiberationSerif-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Regular.ttf
 %else
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationMono-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationMono-Regular.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSans-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSans-Regular.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-BoldItalic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-BoldItalic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-BoldItalic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-BoldItalic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Bold.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Bold.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Bold.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Bold.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Italic.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Italic.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Italic.ttf
 ln -s --relative \
-      %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
-      %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Regular.ttf
+    %{buildroot}%{_datadir}/fonts/liberation/LiberationSerif-Regular.ttf \
+    %{buildroot}%{_datadir}/calibre/fonts/liberation/LiberationSerif-Regular.ttf
 %endif
 
 # Remove these 2 appdata files, we can only include one
@@ -365,19 +344,22 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/calibre-g
 %{_bindir}/markdown-calibre
 %{_bindir}/web2disk
 %{_libdir}/calibre/
+%{python3_sitelib}/init_calibre.py
+%{python3_sitelib}/__pycache__/init_calibre.*.py*
 %{_datadir}/calibre/
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 %{_datadir}/mime/packages/*
 %{_datadir}/icons/hicolor/*/mimetypes/*
 %{_datadir}/icons/hicolor/*/apps/*
-%{python3_sitelib}/init_calibre.py
-%{python3_sitelib}/__pycache__/init_calibre.*.py*
-%{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/*
 %{_datadir}/zsh/site-functions/_calibre
 %{_datadir}/metainfo/*.appdata.xml
 
 %changelog
+* Sun Jan 12 2020 Xxx Xxx <xxx@xxx.xxx> - 4.8.0-3
+- Clean up SPEC file
+
 * Sun Jan 12 2020 Marcus A. Romer <aimylios@gmx.de> - 4.8.0-2
 - Update dependencies.
 - Remove some obsolete packaging workarounds.
